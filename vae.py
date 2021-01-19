@@ -5,6 +5,7 @@ import torch.nn as nn
 from torchvision import datasets
 from torch.utils.data import DataLoader
 from torchvision.transforms import transforms
+import numpy as np
 
 from train import train_vae
 
@@ -12,7 +13,7 @@ from train import train_vae
 class VAE(nn.Module):
     """Implement the Variational Auto Encoder."""
 
-    def __init__(self, input_size, n_hidden_neurons, n_latent_dim=20):
+    def __init__(self, input_size=28*28, n_hidden_neurons=200, n_latent_dim=20):
         """Init.
 
         Args:
@@ -73,6 +74,11 @@ class VAE(nn.Module):
         # regularization term of the loss
         return x, mu, logvar
 
+    def reconstruct(self, x):
+        x_reconstruced = self.forward(x)[0]
+        s = np.sqrt(self.input_size).astype(int)
+        return x_reconstruced.view(-1, 1, s, s)
+
 
 if __name__ == '__main__':
     # Create the VAE model
@@ -87,7 +93,7 @@ if __name__ == '__main__':
     n_epochs = 10
     gclip = 1
 
-    loader = DataLoader(mnist, batch_size=batch_size)
+    loader = DataLoader(mnist, batch_size=batch_size, shuffle=True)
 
     optimizer = torch.optim.SGD(params=vae.parameters(), lr=lr)
 
