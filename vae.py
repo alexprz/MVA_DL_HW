@@ -89,16 +89,22 @@ if __name__ == '__main__':
 
     # Training parameters
     batch_size = 128
-    lr = 0.001
-    n_epochs = 10
+    lr = 0.01
+    n_epochs = 80
     gclip = 1
 
     loader = DataLoader(mnist, batch_size=batch_size, shuffle=True)
 
     optimizer = torch.optim.SGD(params=vae.parameters(), lr=lr)
+    sched = torch.optim.lr_scheduler.StepLR(optimizer, step_size=2, gamma=0.5)
+    # sched = torch.optim.lr_scheduler.OneCycleLR(optimizer, lr,
+    #                                             epochs=n_epochs,
+    #                                             steps_per_epoch=len(loader),
+    #                                             )
 
     for epoch in range(1, n_epochs+1):
         train_vae(vae, loader, optimizer, epoch=epoch, gradient_clip=gclip)
+        sched.step()
 
     os.makedirs('trained_models/', exist_ok=True)
     torch.save(vae.state_dict(), f'trained_models/vae-epochs_{n_epochs}-lr_{lr}-bs_{batch_size}-gclip_{gclip}.pth')

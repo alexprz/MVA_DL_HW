@@ -38,4 +38,11 @@ vae.load_state_dict(state_dict)
 x_reconstruct = vae.reconstruct(x)
 imshow(make_grid(x_reconstruct))
 
+# With training (80 epochs)
+state_dict = torch.load('trained_models/vae-epochs_80-lr_0.01-bs_128-gclip_1.pth')
+vae.load_state_dict(state_dict)
+
+x_reconstruct = vae.reconstruct(x)
+imshow(make_grid(x_reconstruct))
+
 plt.show()
