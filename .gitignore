@@ -1,3 +1,7 @@
 venv
 .vscode
 .DS_Store
+.mypy_cache
+__pycache__
+MNIST
+trained_models
