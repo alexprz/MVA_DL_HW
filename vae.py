@@ -1,4 +1,4 @@
-"""Implement the VAE example of the homework (questions 9, 10, 11)"""
+"""Implement the VAE example of the homework (questions 9, 10, 11)."""
 import torch
 import torch.nn as nn
 
@@ -49,6 +49,7 @@ class VAE(nn.Module):
         return self.decode(z)
 
     def forward(self, x):
+        """Compute an ouput given an input."""
         # Encode x
         x = x.view(1, self.input_size)
         mu, logvar = self.encode(x)
