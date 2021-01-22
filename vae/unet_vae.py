@@ -120,6 +120,8 @@ if __name__ == '__main__':
     os.makedirs('trained_models/', exist_ok=True)
 
     for epoch in range(1, n_epochs+1):
+        for param_group in optimizer.param_groups:
+            print(param_group['lr'])
         train_vae(unet_vae, loader, optimizer, epoch=epoch, gradient_clip=gclip, log_interval=100, use_cuda=use_cuda)
         sched.step()
 
