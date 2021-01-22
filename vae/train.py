@@ -15,11 +15,10 @@ def train_vae(model, loader, optimizer, log_interval=100,
         optimizer.zero_grad()
 
         x_reconstruct, mu, logvar = model(x)
-        x = x.view(-1, model.input_size)
+        # x = x.view(-1, model.input_size)
+        x = x.view(x_reconstruct.size())
 
         # Compute the reconstruction loss
-        # print('recons', x_reconstruct)
-        # print('x', x)
         reconstruction_loss = F.binary_cross_entropy(x_reconstruct, x, reduction='sum')
 
         # Compute the regularization loss. Here we have a closed form
