@@ -16,6 +16,9 @@ def train_vae(model, loader, optimizer, log_interval=100,
 
         x_reconstruct, mu, logvar = model(x)
         # x = x.view(-1, model.input_size)
+        # print(x.size())
+        # print(x_reconstruct.size())
+        # exit()
         x = x.view(x_reconstruct.size())
 
         # Compute the reconstruction loss
