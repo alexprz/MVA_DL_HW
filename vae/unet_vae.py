@@ -58,6 +58,7 @@ class UNetVAE(nn.Module):
 
     def decoder(self, z):
         """Implement the decoder part of the network."""
+        z = z.view(-1, 20, 1, 1)
         return self.decode(z)
 
     def forward(self, x):
@@ -73,8 +74,8 @@ class UNetVAE(nn.Module):
 
         # print(mu.size())
         # print(logvar.size())
-        # print(z.size())
-        z = z.view(-1, 20, 1, 1)
+        # # print(z.size())
+        # z = z.view(-1, 20, 1, 1)
         # print(z.size())
         # exit()
         # Decode the sampled z
