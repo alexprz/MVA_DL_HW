@@ -92,8 +92,16 @@ class UNetVAE(nn.Module):
 
 
 if __name__ == '__main__':
+    use_cuda = torch.cuda.is_available()
+    if use_cuda :
+        device = torch.device("cuda")
+        print("using GPU")
+    else :
+        device = torch.device("cpu")
+        print("using CPU")
+
     # Create the VAE model
-    unet_vae = UNetVAE()
+    unet_vae = UNetVAE().to(device)
 
     # Load the MNIST dataset
     mnist = datasets.MNIST('MNIST/', train=True, download=True, transform=transforms.ToTensor())
@@ -117,7 +125,7 @@ if __name__ == '__main__':
     os.makedirs('trained_models/', exist_ok=True)
 
     for epoch in range(1, n_epochs+1):
-        train_vae(unet_vae, loader, optimizer, epoch=epoch, gradient_clip=gclip, log_interval=10)
+        train_vae(unet_vae, loader, optimizer, epoch=epoch, gradient_clip=gclip, log_interval=10, use_cuda=use_cuda)
         # sched.step()
 
         if epoch in save_points:
