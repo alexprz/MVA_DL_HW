@@ -323,10 +323,13 @@ def trainIters(encoder, decoder, n_iters, print_every=1000, plot_every=100, lear
     showPlot(plot_losses)
 
 # %%
+import matplotlib
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
 import matplotlib.ticker as ticker
 import numpy as np
+
+%matplotlib inline
 
 
 def showPlot(points):
@@ -389,11 +392,71 @@ encoder1 = EncoderRNN(input_lang.n_words, hidden_size).to(device)
 attn_decoder1 = AttnDecoderRNN(hidden_size, output_lang.n_words, dropout_p=0.1).to(device)
 
 trainIters(encoder1, attn_decoder1, 75000, print_every=5000)
+#%%
+encoder2 = EncoderRNN(input_lang.n_words, hidden_size).to(device)
+decoder2 = DecoderRNN(hidden_size, output_lang.n_words).to(device)
+
+trainIters(encoder2, decoder2, 75000, print_every=5000)
+
 
 # %%
 
 encoder1 = EncoderRNN(input_lang.n_words, hidden_size).to(device)
 attn_decoder1 = AttnDecoderRNN(hidden_size, output_lang.n_words, dropout_p=0.1).to(device)
 
-encoder1.load_state_dict(torch.load('models/encoder1.pth'))
-attn_decoder1.load_state_dict(torch.load('models/attn_decoder1.pth'))
+# %%
+encoder1.load_state_dict(torch.load('models/encoder1.pth', map_location=torch.device('cpu')))
+# %%
+attn_decoder1.load_state_dict(torch.load('models/attn_decoder1.pth', map_location=torch.device('cpu')))
+
+# %%
+evaluateRandomly(encoder1, attn_decoder1)
+
+# %%
+output_words, attentions = evaluate(
+    encoder1, attn_decoder1, "je suis trop froid .")
+
+print(output_words)
+print(attentions.size())
+plt.matshow(attentions.numpy())
+
+# %%
+def showAttention(input_sentence, output_words, attentions):
+    # Set up figure with colorbar
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    cax = ax.matshow(attentions.numpy(), cmap='bone')
+    fig.colorbar(cax)
+
+    # Set up axes
+    ax.set_xticklabels([''] + input_sentence.split(' ') +
+                       ['<EOS>'], rotation=90)
+    ax.set_yticklabels([''] + output_words)
+
+    # Show label at every tick
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
+    ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
+
+    plt.show()
+
+
+def evaluateAndShowAttention(input_sentence):
+    output_words, attentions = evaluate(
+        encoder1, attn_decoder1, input_sentence)
+    print('input =', input_sentence)
+    print('output =', ' '.join(output_words))
+    showAttention(input_sentence, output_words, attentions)
+
+
+# %%
+evaluateAndShowAttention("elle a cinq ans de moins que moi .")
+
+# %%
+evaluateAndShowAttention("elle est trop petit .")
+
+# %%
+evaluateAndShowAttention("je ne crains pas de mourir .")
+
+# %%
+evaluateAndShowAttention("il met sa veste car il a froid .")
+# %%
