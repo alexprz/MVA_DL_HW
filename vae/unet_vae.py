@@ -19,17 +19,18 @@ class UNetVAE(nn.Module):
         super().__init__()
 
         self.encode = nn.Sequential(  # 28, 28
-            nn.Conv2d(1, 64, kernel_size=3),  # 26, 26
+            nn.Conv2d(1, 32, kernel_size=3),  # 26, 26
             nn.ReLU(),
-            nn.Conv2d(64, 64, kernel_size=3),  # 24, 24
+            nn.Conv2d(32, 32, kernel_size=3),  # 24, 24
             nn.ReLU(),
             nn.MaxPool2d(2),  # 12, 12
-            nn.Conv2d(64, 128, kernel_size=3),  # 10, 10
+            nn.Conv2d(32, 64, kernel_size=3),  # 10, 10
             nn.ReLU(),
-            nn.Conv2d(128, 128, kernel_size=3),  # 8, 8
+            nn.Conv2d(64, 64, kernel_size=3),  # 8, 8
             nn.ReLU(),
-            nn.MaxPool2d(2),  # 4, 4
-            nn.Conv2d(128, 8, kernel_size=3),  # 2, 2
+            nn.Conv2d(64, 128, kernel_size=3),  # 6, 6
+            nn.ReLU(),
+            nn.Conv2d(128, 2, kernel_size=3),  # 4, 4
             nn.ReLU(),
         )
 
@@ -55,10 +56,10 @@ class UNetVAE(nn.Module):
     def encoder(self, x):
         """Implement the encoder part of the network."""
         x = self.encode(x)  # 2, 2 (8 channels)
-        mu, logvar = torch.split(x, split_size_or_sections=4, dim=1)
+        mu, logvar = torch.split(x, split_size_or_sections=1, dim=1)
 
-        mu = mu.view(-1, 2*2*4)  # 16
-        logvar = logvar.view(-1, 2*2*4)  # 16
+        mu = mu.view(-1, 16)  # 16
+        logvar = logvar.view(-1, 16)  # 16
 
         return mu, logvar
 
@@ -77,12 +78,8 @@ class UNetVAE(nn.Module):
         eps = torch.randn_like(logvar)
         z = mu + eps*std
 
-        # print(mu.size())
-        # print(logvar.size())
-        # print(z.size())
         z = z.view(-1, 1, 4, 4)
-        # print(z.size())
-        # exit()
+
         # Decode the sampled z
         x = self.decoder(z)
 
@@ -116,7 +113,7 @@ if __name__ == '__main__':
     loader = DataLoader(mnist, batch_size=batch_size, shuffle=True)
 
     optimizer = torch.optim.SGD(params=unet_vae.parameters(), lr=lr)
-    sched = torch.optim.lr_scheduler.StepLR(optimizer, step_size=2, gamma=0.5)
+    sched = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.1)
     # sched = torch.optim.lr_scheduler.OneCycleLR(optimizer, lr,
     #                                             epochs=n_epochs,
     #                                             steps_per_epoch=len(loader),
@@ -125,7 +122,7 @@ if __name__ == '__main__':
     os.makedirs('trained_models/', exist_ok=True)
 
     for epoch in range(1, n_epochs+1):
-        train_vae(unet_vae, loader, optimizer, epoch=epoch, gradient_clip=gclip, log_interval=100, use_cuda=use_cuda)
+        train_vae(unet_vae, loader, optimizer, epoch=epoch, gradient_clip=gclip, log_interval=10, use_cuda=use_cuda)
         sched.step()
 
         if epoch in save_points:
