@@ -111,7 +111,7 @@ if __name__ == '__main__':
     lr = 0.0001
     n_epochs = 80
     gclip = 1
-    save_points = [1, 5, 10, 20, 50, 80]
+    save_points = [1, 5, 10, 20, 30, 40, 50, 60, 70, 80]
 
     loader = DataLoader(mnist, batch_size=batch_size, shuffle=True)
 
