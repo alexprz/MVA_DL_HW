@@ -1,4 +1,4 @@
-"""Implement the VAE example of the homework (questions 9, 10, 11)."""
+"""Implement the VAE example of the homework (questions 9, 10)."""
 import os
 import torch
 import torch.nn as nn
@@ -46,6 +46,7 @@ class VAE(nn.Module):
 
     def encoder(self, x):
         """Implement the encoder part of the network."""
+        x = x.view(-1, self.input_size)
         x = self.relu(self.e_fc1(x))
         mu = self.e_fc2_mu(x)
         logvar = self.e_fc2_logvar(x)
@@ -54,12 +55,14 @@ class VAE(nn.Module):
 
     def decoder(self, z):
         """Implement the decoder part of the network."""
-        return self.decode(z)
+        x = self.decode(z)
+        s = np.sqrt(self.input_size).astype(int)
+        x = x.view(-1, 1, s, s)
+        return x
 
     def forward(self, x):
         """Compute an ouput given an input."""
         # Encode x
-        x = x.view(-1, self.input_size)
         mu, logvar = self.encoder(x)
 
         # Sample a z in the latent space
