@@ -18,40 +18,34 @@ def imshow(img):
 
 
 vae = UNetVAE()
-# vae.load_state_dict(state_dict)
 
-os.makedirs('figs/q11/', exist_ok=True)
-mnist = datasets.MNIST('MNIST/', train=True, download=True, transform=transforms.ToTensor())
-loader = DataLoader(mnist, batch_size=64, shuffle=False)
+os.makedirs('figs/q11_v2/', exist_ok=True)
 
-# Ground truth
-x, target = next(iter(loader))
-imshow(make_grid(x))
-plt.axis('off')
-plt.savefig('figs/q11/mnist-ground-turth.pdf', bbox_inches='tight')
+# Sample in the latent space following N(0, 1)
+Z = torch.randn((64, 20))
 
 # Without training
-x_reconstruct = vae.forward(x)[0]
+x_reconstruct = vae.decoder(Z)
 imshow(make_grid(x_reconstruct))
 plt.axis('off')
-plt.savefig('figs/q11/mnist-vae-no-training.pdf', bbox_inches='tight')
+plt.savefig('figs/q11_v2/mnist-vae-no-training.pdf', bbox_inches='tight')
 
 # With training (10 epochs)
 state_dict = torch.load('trained_models/unet-vae-v4/unet-vae-epochs_10-lr_0.0001-bs_128-gclip_1.pth', map_location=torch.device('cpu'))
 vae.load_state_dict(state_dict)
 
-x_reconstruct = vae.forward(x)[0]
+x_reconstruct = vae.decoder(Z)
 imshow(make_grid(x_reconstruct))
 plt.axis('off')
-plt.savefig('figs/q11/mnist-vae-10-epochs.pdf', bbox_inches='tight')
+plt.savefig('figs/q11_v2/mnist-vae-10-epochs.pdf', bbox_inches='tight')
 
 # With training (80 epochs)
-state_dict = torch.load('trained_models/unet-vae-v4/unet-vae-epochs_10-lr_0.0001-bs_128-gclip_1.pth', map_location=torch.device('cpu'))
+state_dict = torch.load('trained_models/unet-vae-v4/unet-vae-epochs_80-lr_0.0001-bs_128-gclip_1.pth', map_location=torch.device('cpu'))
 vae.load_state_dict(state_dict)
 
-x_reconstruct = vae.forward(x)[0]
+x_reconstruct = vae.decoder(Z)
 imshow(make_grid(x_reconstruct))
 plt.axis('off')
-plt.savefig('figs/q11/mnist-vae-80-epochs.pdf', bbox_inches='tight')
+plt.savefig('figs/q11_v2/mnist-vae-80-epochs.pdf', bbox_inches='tight')
 
 plt.show()
