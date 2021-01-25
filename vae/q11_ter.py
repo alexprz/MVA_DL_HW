@@ -1,4 +1,4 @@
-"""Implement the question 10: plot reconstruction samples."""
+"""Implement the question 11."""
 import os
 import torch
 from torchvision.utils import make_grid
